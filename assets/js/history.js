@@ -10,20 +10,36 @@ btnSearch.addEventListener('click', searchHistory);
 let getHistoryStorage = JSON.parse(localStorage.getItem('arrHistoryBill'));
 let html = '';
 
-let options = '<option value="" selected>Selecionar</option>';
 let arrhistory = [];
 let arrSearchHistory = [];
+let SEARCH = false;
 
 getHistoryStorage.forEach(data=> arrhistory.push(data));
 
-arrhistory.reverse();
+function selectHistoryContent() {
 
-arrhistory.forEach(data => {
-    let {currentDate} = data;
-    options += `<option value="${currentDate.replace(',', '')}">${currentDate.replace(',', '')}</option>`;
-});
+    let options = '<option value="" selected>Selecionar</option>';
 
-selectSearch.innerHTML = options;
+    if (SEARCH) {
+
+        arrSearchHistory.forEach(data => {
+            let {currentDate} = data;
+            options += `<option value="${currentDate.replace(',', '')}">${currentDate.replace(',', '')}</option>`;
+        });
+
+    } else {
+
+        arrhistory.forEach(data => {
+            let {currentDate} = data;
+            options += `<option value="${currentDate.replace(',', '')}">${currentDate.replace(',', '')}</option>`;
+        });
+    }
+
+    selectSearch.innerHTML = options;
+
+}
+
+selectHistoryContent();
 
 function searchHistory() {
 
@@ -31,14 +47,22 @@ function searchHistory() {
     arrSearchHistory = [];
 
     if (search == '') {
-        generateHtmlList(arrhistory);
+        SEARCH = false;
+        generateHtmlList();
+        selectHistoryContent();
         return
-    };
+    }
 
-    let list = arrhistory.filter(data => data.currentDate.includes(search));
+    arrhistory.filter((data,i) => {
+        if (data.currentDate.includes(search)) {
+            return arrSearchHistory[i] = data;
+        }
+    });
 
-    arrSearchHistory = list; 
-    generateHtmlList(arrSearchHistory);
+    selectSearch.value = selectSearch[0];
+    SEARCH = true;
+    generateHtmlList();
+    selectHistoryContent();
 }
 
 function printListPdf() {
@@ -53,13 +77,21 @@ function printListPdf() {
     generatePdf(title, htmlGenerate);
 }
 
-function generateHtmlList(arrayCurrent) {
-
+function generateHtmlList() {
     
+    if (SEARCH) {
+        getCurrentList(arrSearchHistory);
+    } else {
+        getCurrentList(arrhistory);
+    }
+}
+
+function getCurrentList(arrayCurrent) {
+
     let total = 0;
     html = '';
-    
-    arrayCurrent.forEach(dataList => {
+
+    arrayCurrent.forEach((dataList, i) => {
 
         let {currentDate, data} = dataList;
         total = 0;
@@ -76,8 +108,14 @@ function generateHtmlList(arrayCurrent) {
                 <ul class="list-group mt-3">
 
                     <ul class="list-group">
-                        <li class="list-group-item bg-secondary text-light">
-                            Data: ${currentDate.replace(',', '')}
+                        <li class="list-group-item bg-secondary text-light d-flex justify-content-between align-items-center">
+                            <span>
+                                Data: ${currentDate.replace(',', '')}
+                            </span>
+                            <span role="button" title="Excluir" id="${i}" onclick="deleteHistory(event)"
+                            data-bs-toggle="modal" data-bs-target="#deleteHistory">
+                                ${ICONS.trash}
+                            </span>
                         </li>
                     </ul>
                     
@@ -93,8 +131,24 @@ function generateHtmlList(arrayCurrent) {
                 </ul>`;
     });
     
-    console.log(total);
     divContentList.innerHTML = html;
 }
 
-generateHtmlList(arrhistory);
+function deleteHistory(event) {
+
+    let id = event.currentTarget.id;
+    const btnConfirm = document.querySelector('#btn-delete-history');
+
+    btnConfirm.addEventListener('click', () => {
+        arrhistory.splice(id,1);
+        SEARCH=false;
+        alertMsg(true, 'success', 'Lista excluída do histórico com sucesso!');
+
+        generateHtmlList();
+        selectHistoryContent();
+
+        localStorage.setItem('arrHistoryBill', JSON.stringify(arrhistory));
+    });
+}
+
+generateHtmlList();

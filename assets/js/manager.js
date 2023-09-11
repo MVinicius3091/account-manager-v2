@@ -107,65 +107,46 @@ function printList() {
                     body{
                         font-family: Arial, Helvetica, sans-serif
                     }
-
-                    .container {
-                        border: solid 1px;
-                        border-radius: 5px;
-                        padding: 10px;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                    }
-
-                    table {
-                        border-collapse: collapse;
-                        border: solid 1px;
-                        width: 60%;
-                        border-radius: 5px;
-                    }
-
-                    table thead {
-                        height: 40px;
-                        background: #000;
-                        color: #fff;
+                    
+                    .container h3 {
                         text-align: center;
+                        margin: 0 auto;
                     }
 
-                    thead, td {
-                        border: solid 1px #000;
+                    ul {
+                        width: 300px;
+                        margin: 0 auto;
+                        padding: 0;
                     }
 
-                    tbody tr td {
-                        padding: 10px 0;
-                    }
-
-                    div, tbody, tr {
+                    ul li {
+                        list-style: none;
+                        border-bottom: solid 1px #000;
+                        margin: 5px 0;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 100%;
                         page-break-before: auto;
                         page-break-after: auto; 
                         page-break-inside: avoid;
                         position: relative;
                     }
+
                 </style>
                 <body>
                     <div class="container">
                         <h3>Lista de Contas - ${date}</h3>
-                        <table> 
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+                        <ul>`;
 
     if (SEARCH) {
 
         arrSearchBill.forEach((data, i) => {
 
-            html += `<tr id="tr-list">
-                        <td align="center">${data.name}</td>
-                        <td align="center">R$ ${data.val}</td>
-                    </tr>`;
+            html += `<li>
+                        <span align="center">${data.name}</span>
+                        <span align="center">R$ ${data.val}</span>
+                    </li>`;
     
             total += parseFloat(data.val.replace(',', '.'));
             
@@ -175,27 +156,24 @@ function printList() {
 
         arrBillCreate.forEach((data, i) => {
 
-            html += `<tr id="tr-list">
-                        <td align="center">${data.name}</td>
-                        <td align="center">R$ ${data.val}</td>
-                    </tr>`;
+            html += `<li>
+                        <span>${data.name}</span>
+                        <span>R$ ${data.val}</span>
+                    </li>`;
     
             total += parseFloat(data.val.replace(',', '.'));
             
         });
     }
 
-    html += `</tbody>
-             <tfooter>
-                <tr>
-                    <td align="center">Total</td>
-                    <td align="center">R$ ${String(total.toFixed(2)).replace('.', ',')}</td>
-                </tr>
-             </tfooter>
-                </table>
-                    </div>
-                        </body>
-                            </html>`;
+    html += `<li>
+                <span>Total</span>
+                <span>R$ ${String(total.toFixed(2)).replace('.', ',')}</span>
+            </li>
+            </ul>
+                </div>
+                    </body>
+                        </html>`;
   
     generatePdf(title, html);
 }
@@ -356,7 +334,7 @@ function createHtmlList(arrayCurrent) {
                         </span>
                     </div>
 
-                    <div class="col-2">
+                    <div class="col-3">
 
                         <a href="javascript:void(0)" onclick="editBill(event)" class="position-relative p-2 text-decoration-none"  title="Editar" id="${i}">
                             ${ICONS.pencil}
