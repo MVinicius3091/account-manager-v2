@@ -112,10 +112,15 @@ function getCurrentList(arrayCurrent) {
                             <span>
                                 Data: ${currentDate.replace(',', '')}
                             </span>
-                            <span role="button" title="Excluir" id="${i}" onclick="deleteHistory(event)"
-                            data-bs-toggle="modal" data-bs-target="#deleteHistory">
-                                ${ICONS.trash}
-                            </span>
+                            <div>
+                                <span role="button" title="Restaurar" class="me-2" id="${i}" onclick="restoreBill(event)">
+                                    ${ICONS.restore}
+                                </span>
+                                <span role="button" title="Excluir" id="${i}" onclick="deleteHistory(event)"
+                                data-bs-toggle="modal" data-bs-target="#deleteHistory">
+                                    ${ICONS.trash}
+                                </span>
+                            </div>
                         </li>
                     </ul>
                     
@@ -132,6 +137,16 @@ function getCurrentList(arrayCurrent) {
     });
     
     divContentList.innerHTML = html;
+}
+
+function restoreBill(event) {
+
+    let id = event.currentTarget.id;
+    let dataRestore = arrhistory[id].data;
+
+    localStorage.setItem('arrBillCreate', JSON.stringify(dataRestore));
+
+    alertMsg(true, 'success', 'Lista restaurada com sucesso!');
 }
 
 function deleteHistory(event) {
